@@ -1,16 +1,18 @@
 const asyncHandler = require("express-async-handler");
 const Account = require("../models/Account");
-const { userId } = require("../config/types");
+const mongoose  = require("mongoose");
 
 const getUserBalance = asyncHandler(async (req, res) => {
-  const account = await Account.findById(req.userId).select(
+  const account = await Account.findOne({userId : req.userId}).select(
     "-createdAt -updatedAt -__v"
   );
-
+  console.log("req.userId", req.userId)
   if (!account) {
-    return res
-      .status(404)
-      .json({ status: "failure", msg: "Account not found" });
+    return res.status(404).json({
+      status: "failure",
+      msg: "Account not found",
+      userId: req.userId,
+    });
   }
 
   res.status(200).json({ status: "success", data: account });
@@ -18,13 +20,13 @@ const getUserBalance = asyncHandler(async (req, res) => {
 
 const transfer = asyncHandler(async (req, res) => {
   // https://stackoverflow.com/questions/51461952/mongodb-v4-0-transaction-mongoerror-transaction-numbers-are-only-allowed-on-a
-  
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
   const { amount, receiverId } = req.body;
 
-  const sender = await Account.findById({ userId: req.userId })
+  const sender = await Account.findOne({ userId: req.userId })
     .select("-createdAt -updatedAt -__v")
     .session(session);
 
@@ -36,7 +38,7 @@ const transfer = asyncHandler(async (req, res) => {
     });
   }
 
-  const receiver = await Account.findById({ userId: receiverId }).select(
+  const receiver = await Account.findOne({ userId: receiverId }).select(
     "-createdAt -updatedAt -__v"
   );
 
@@ -58,6 +60,7 @@ const transfer = asyncHandler(async (req, res) => {
   ).session(session);
 
   await session.commitTransaction();
+  console.log("Transfer done")
 
   res.status(200).json({
     status: "success",

@@ -31,12 +31,10 @@ const registerUser = asyncHandler(async (req, res) => {
   // ====== random balance to user =======
   await Account.create({
     userId: user._id,
-    balance: Math.floor(Math.random() * 1000),
+    balance: Math.floor(Math.random() * 10000),
   });
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
 
   const userData = {
     username: user.username,
@@ -70,9 +68,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const userObj = user.toObject();
   delete userObj.password;
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
 
   res.status(200).json({
     status: "success",
@@ -103,8 +99,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: "success",
-    msg: "User updated successfully",
-    data: user,
+    msg: "User updated successfully"
   });
 });
 
@@ -117,7 +112,7 @@ const getAUser = asyncHandler(async (req, res) => {
     {
       $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }],
     },
-    "-password -createdAt -updatedAt"
+    "-password -createdAt -updatedAt _id -__v"
   ); //or select
 
   if (!user || user.length === 0) {

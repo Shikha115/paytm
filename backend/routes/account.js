@@ -4,6 +4,6 @@ const userAuth = require("../middlewares/userAuth");
 const router = express.Router();
 
 router.get("/balance", userAuth, getUserBalance);
-router.get("/transfer", userAuth, transfer);
+router.post("/transfer", userAuth, transfer);
 
 module.exports = router;
