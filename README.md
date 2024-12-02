@@ -1,6 +1,6 @@
 # PayM-like Application
 
-## Step 1 - What are we building?
+## What are we building?
 
 We are building a **PayM-like application** that lets users send money to each other, starting with an initial dummy balance. This project is part of the **100xDev Course** by Harkirat Singh.
 
