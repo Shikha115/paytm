@@ -27,7 +27,7 @@ const errorLog = async (err, req, res, next) => {
   res.status(500).json({  // Set the correct status code for server errors
     status: "failure",
     data: "msg from error middleware",
-    message: err.message,
+    msg: err.message,
   });
   next();
 };

@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorMessage from "./pages/ErrorMessage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Loading from "./components/Loading";
+import Profile from "./pages/Profile";
+
+const Signup = lazy(() => import("./pages/Signup"));
+const Signin = lazy(() => import("./pages/Signin"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const SendMoney = lazy(() => import("./pages/SendMoney"));
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <BrowserRouter>
+        <ErrorBoundary
+          fallbackRender={({ error, resetErrorBoundary }) => (
+            <ErrorMessage
+              error={error}
+              resetErrorBoundary={resetErrorBoundary}
+            />
+          )}
+        >
+          <Suspense
+            fallback={
+              <Loading />
+            }
+          >
+            <Routes>
+              <Route exact path="/" element={<Signin />} />
+              <Route exact path="/signup" element={<Signup />} />
+              <Route element={<ProtectedRoute />}>
+                <Route exact path="/dashboard" element={<Dashboard />} />
+                <Route exact path="/send-money" element={<SendMoney />} />
+                <Route exact path="/profile" element={<Profile />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
+      </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

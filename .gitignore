@@ -7,3 +7,6 @@
 **/*.log
 
 !**/.env.example
+
+
+**/dummy_data

@@ -55,7 +55,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
   //validated in userValidate middleware
 
-  const user = await User.findOne({ username }).select("-createdAt -updatedAt -__v -_id");
+  const user = await User.findOne({ username }).select(
+    "-createdAt -updatedAt -__v"
+  );
   const isMatch = bcrypt.compareSync(password, user.password);
 
   if (!user || !isMatch) {
@@ -69,6 +71,9 @@ const loginUser = asyncHandler(async (req, res) => {
   delete userObj.password;
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+  console.log("user._id", user._id);
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  console.log("decoded", decoded);
 
   res.status(200).json({
     status: "success",
@@ -88,7 +93,7 @@ const updateUser = asyncHandler(async (req, res) => {
   const user = await User.updateOne(
     { _id: req.userId },
     { $set: { password: hashPassword, firstName, lastName } }
-  ).select("-createdAt -updatedAt -__v -_id -password");
+  ).select("-createdAt -updatedAt -__v -password");
 
   if (user.matchedCount === 0 || user.modifiedCount === 0) {
     return res.status(400).json({
@@ -99,11 +104,33 @@ const updateUser = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: "success",
-    msg: "User updated successfully"
+    msg: "User updated successfully",
   });
 });
 
 const getAUser = asyncHandler(async (req, res) => {
+  const user = await User.find(
+    {
+      _id: req.userId,
+    },
+    "-password -createdAt -updatedAt -__v"
+  ); //or select
+
+  if (!user) {
+    return res.status(404).json({
+      status: "failure",
+      msg: "User not found",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    msg: "User found successfully",
+    data: user,
+  });
+});
+
+const getAllUser = asyncHandler(async (req, res) => {
   const filter = req.query.filter || "";
 
   const regex = new RegExp(filter, "i"); //i = case insensitive
@@ -111,8 +138,9 @@ const getAUser = asyncHandler(async (req, res) => {
   const user = await User.find(
     {
       $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }],
+      _id: { $ne: req.userId },
     },
-    "-password -createdAt -updatedAt _id -__v"
+    "-password -createdAt -updatedAt -__v"
   ); //or select
 
   if (!user || user.length === 0) {
@@ -129,4 +157,4 @@ const getAUser = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { registerUser, loginUser, updateUser, getAUser };
+module.exports = { registerUser, loginUser, updateUser, getAUser, getAllUser };

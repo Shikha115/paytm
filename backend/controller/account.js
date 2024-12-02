@@ -29,12 +29,12 @@ const transfer = asyncHandler(async (req, res) => {
   const sender = await Account.findOne({ userId: req.userId })
     .select("-createdAt -updatedAt -__v")
     .session(session);
-
+  console.log("sender", sender,req.userId )
   if (!sender || sender.balance < amount) {
     await session.abortTransaction();
     return res.status(404).json({
       status: "failure",
-      msg: "Sender Account not found or insufficient balance",
+      msg: `Sender Account not found or insufficient balance ${sender?.balance}`,
     });
   }
 

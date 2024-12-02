@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const userAuth = (req, res, next) => {
   const auth = req.get("Authorization");
   
-  console.log("User auth", auth);
+  // console.log("User auth", auth);
 
   if (!auth || !auth.startsWith("Bearer")) {
     return res
@@ -17,6 +17,7 @@ const userAuth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("decoded", decoded);
     req.userId = decoded.userId;
     next();
   } catch (err) {

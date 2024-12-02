@@ -11,7 +11,7 @@ To begin, clone the repository using the following command:
 
 ```bash
 git clone https://github.com/Shikha115/paytm.git
-
+```
 
 This will give you the initial structure of the application to start building the features.
 
@@ -21,6 +21,7 @@ For detailed instructions on how to set up and work with this project, please re
 
 ```bash
 https://projects.100xdevs.com/tracks/oAjvkeRNZThPMxZf4aX5/JLaLbhDuYn3h5Cn7WJu1
+```
 
 
 
